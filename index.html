@@ -1,1 +1,33 @@
-Hello world
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>当前目录下的文件列表</title>
+  </head>
+  <body>
+    <h1>当前目录下的文件列表</h1>
+    <ul id="file-list">
+    </ul>
+    
+    <script>
+      // 使用XMLHttpRequest读取当前目录下的文件列表
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", ".");
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var files = xhr.responseText.split("\n");
+          // 在HTML中显示文件列表
+          var fileList = document.getElementById("file-list");
+          files.forEach(function(file) {
+            if (file) {
+              var listItem = document.createElement("li");
+              listItem.appendChild(document.createTextNode(file));
+              fileList.appendChild(listItem);
+            }
+          });
+        }
+      };
+      xhr.send();
+    </script>
+  </body>
+</html>
