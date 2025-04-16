@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页收藏列表</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    input, button {
+      font-size: 1rem;
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 15px;
+    }
+    .item {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-left: 5px solid #007bff;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .item span {
+      word-break: break-word;
+      font-size: 0.95rem;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-group button {
+      flex: 1;
+    }
+    @media(min-width: 480px) {
+      input {
+        width: calc(50% - 10px);
+        display: inline-block;
+      }
+      button {
+        width: auto;
+        margin-left: 10px;
+      }
+      .item {
+        flex-direction: row;
+        align-items: center;
+      }
+      .btn-group {
+        margin-left: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📌 网页收藏</h1>
+  <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <input type="text" id="url" placeholder="请输入网页链接">
+    <input type="text" id="note" placeholder="请输入备注">
+    <button onclick="addItem()">添加</button>
+  </div>
+
+  <ul id="list"></ul>
+
+  <script>
+    const listEl = document.getElementById('list');
+
+    function getStoredItems() {
+      return JSON.parse(localStorage.getItem('webList') || '[]');
+    }
+
+    function storeItems(items) {
+      localStorage.setItem('webList', JSON.stringify(items));
+    }
+
+    function renderList() {
+      listEl.innerHTML = '';
+      const items = getStoredItems();
+      items.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'item';
+
+        const span = document.createElement('span');
+        span.textContent = `${item.note}（${item.url}）`;
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+
+        const goBtn = document.createElement('button');
+        goBtn.textContent = '跳转';
+        goBtn.onclick = () => {
+          window.open(item.url, '_blank');
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '删除';
+        delBtn.onclick = () => {
+          const newItems = getStoredItems();
+          newItems.splice(index, 1);
+          storeItems(newItems);
+          renderList();
+        };
+
+        btnGroup.appendChild(goBtn);
+        btnGroup.appendChild(delBtn);
+
+        li.appendChild(span);
+        li.appendChild(btnGroup);
+        listEl.appendChild(li);
+      });
+    }
+
+    function addItem() {
+      const url = document.getElementById('url').value.trim();
+      const note = document.getElementById('note').value.trim();
+
+      if (!url || !note) {
+        alert("请输入完整信息");
+        return;
+      }
+
+      const items = getStoredItems();
+      items.push({ url, note });
+      storeItems(items);
+
+      document.getElementById('url').value = '';
+      document.getElementById('note').value = '';
+
+      renderList();
+    }
+
+    // 页面加载时自动渲染
+    renderList();
+  </script>
+</body>
+</html>
+
